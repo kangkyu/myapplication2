@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
+
+    kotlin("plugin.serialization") version "1.9.22"
 }
 
 kotlin {
@@ -26,6 +28,11 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             //put your multiplatform dependencies here
+            implementation(libs.kotlinx.serialization.json)
+            implementation(libs.kotlinx.coroutines.core)
+
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.cio)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
