@@ -5,14 +5,14 @@ import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import com.example.myapplication.android.UiHelper
+import com.example.myapplication.android.authentication.UserSession
 import net.openid.appauth.AuthorizationRequest
-import net.openid.appauth.AuthorizationResponse
 import net.openid.appauth.AuthorizationService
 import net.openid.appauth.AuthorizationServiceConfiguration
 import net.openid.appauth.CodeVerifierUtil
 import net.openid.appauth.ResponseTypeValues
 import net.openid.appauth.TokenRequest
-import java.util.logging.LogRecord
 
 
 private const val baseUrl = "https://kyohoe-authorization-server-1a58960ea78f.herokuapp.com"
@@ -27,8 +27,9 @@ class GreetingViewModel : ViewModel() {
     private val scope = "public" // Adjust the scope according to your needs
 
     private var authService: AuthorizationService? = null
-    val codeVerifier = CodeVerifierUtil.generateRandomCodeVerifier()
+    private val codeVerifier: String? = CodeVerifierUtil.generateRandomCodeVerifier()
 //    val codeChallenge = CodeVerifierUtil.deriveCodeVerifierChallenge(codeVerifier)
+    private val uiHelper = UiHelper()
 
     fun initAuthService(context: Context) {
         Log.d("ViewModel", "Initializing AuthService")
@@ -88,9 +89,11 @@ class GreetingViewModel : ViewModel() {
                 // Handle token response or exception
                 if (response != null) {
                     // Token exchange succeeded
-                    val accessToken = response.accessToken
+                    val userSession = UserSession(response.accessToken)
+                    userSession.setAccessToken()
                     // Use the access token (e.g., for API calls)
-                    Log.d("ViewModel", "Access Token: $accessToken")
+                    Log.d("ViewModel", "User userSession: $userSession")
+                    goToHome()
                 } else if (exception != null) {
                     // Token exchange failed
                     Log.e("ViewModel", "Token Request Error: ${exception.localizedMessage}")
@@ -98,5 +101,10 @@ class GreetingViewModel : ViewModel() {
                 }
             }
         }
+    }
+
+    fun goToHome() {
+        Log.d("ViewModel", "goToHome")
+        uiHelper.goTo("home")
     }
 }

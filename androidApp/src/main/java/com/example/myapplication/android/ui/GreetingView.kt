@@ -4,7 +4,6 @@ import android.app.Activity
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,7 +16,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -34,7 +32,7 @@ fun GreetingView(viewModel: GreetingViewModel) {
     val authLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { authResult ->
-        Log.d("GreetingView", "hello2")
+        Log.d("GreetingView", "hello from authLauncher")
         if (authResult.resultCode == Activity.RESULT_OK) {
             // Handle authorization response
             val response = AuthorizationResponse.fromIntent(authResult.data!!)
@@ -47,9 +45,10 @@ fun GreetingView(viewModel: GreetingViewModel) {
 
                 viewModel.getTokens(authorizationCode, stateParameter)
             }
-
-            Log.d("GreetingView", "hello")
-            println("************************* ${response?.accessToken}")
+            if (exception != null) {
+                Log.e("GreetingView", "Authorization flow failed", exception)
+            }
+            Log.d("GreetingView", "hello from result OK")
         }
     }
     Scaffold(
