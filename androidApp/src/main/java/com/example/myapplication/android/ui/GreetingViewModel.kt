@@ -5,7 +5,6 @@ import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.example.myapplication.android.UiHelper
 import com.example.myapplication.android.authentication.UserSession
 import net.openid.appauth.AuthorizationRequest
 import net.openid.appauth.AuthorizationService
@@ -29,7 +28,23 @@ class GreetingViewModel : ViewModel() {
     private var authService: AuthorizationService? = null
     private val codeVerifier: String? = CodeVerifierUtil.generateRandomCodeVerifier()
 //    val codeChallenge = CodeVerifierUtil.deriveCodeVerifierChallenge(codeVerifier)
-    private val uiHelper = UiHelper()
+
+    /*
+
+    (possibly) old way:
+
+    val secureRandom = SecureRandom()
+    val bytes = ByteArray(64)
+    secureRandom.nextBytes(bytes)
+
+    val encoding = Base64.URL_SAFE or Base64.NO_PADDING or Base64.NO_WRAP
+    val codeVerifier = Base64.encodeToString(bytes, encoding)
+
+    val digest = MessageDigest.getInstance(Constants.MESSAGE_DIGEST_ALGORITHM)
+    val hash = digest.digest(codeVerifier.toByteArray())
+    val codeChallenge = Base64.encodeToString(hash, encoding)
+
+    */
 
     fun initAuthService(context: Context) {
         Log.d("ViewModel", "Initializing AuthService")
@@ -59,7 +74,7 @@ class GreetingViewModel : ViewModel() {
                 redirectUri
             )
             .setScope(scope)
-//            .setState("abc123")
+            .setState("abc123")
             .setCodeVerifier(codeVerifier)
             .build()
 
@@ -70,7 +85,11 @@ class GreetingViewModel : ViewModel() {
     fun getTokens(authorizationCode: String?, stateParameter: String?) {
 
         if (!authorizationCode.isNullOrEmpty() && !stateParameter.isNullOrEmpty()) {
-//            if (stateParameter != "abc123") ...
+            if (stateParameter != "abc123") {
+                // Handle the error appropriately
+                Log.e("ViewModel", "State parameter doesn't match")
+                return
+            }
 
             // Perform the token request
             val tokenExchangeRequest = TokenRequest.Builder(
@@ -89,22 +108,19 @@ class GreetingViewModel : ViewModel() {
                 // Handle token response or exception
                 if (response != null) {
                     // Token exchange succeeded
+                    // TODO: set profile data
                     val userSession = UserSession(response.accessToken)
                     userSession.setAccessToken()
                     // Use the access token (e.g., for API calls)
                     Log.d("ViewModel", "User userSession: $userSession")
-                    goToHome()
+                    // TODO: go to home view
                 } else if (exception != null) {
                     // Token exchange failed
                     Log.e("ViewModel", "Token Request Error: ${exception.localizedMessage}")
                     // Handle the error appropriately
+                    // ...
                 }
             }
         }
-    }
-
-    fun goToHome() {
-        Log.d("ViewModel", "goToHome")
-        uiHelper.goTo("home")
     }
 }

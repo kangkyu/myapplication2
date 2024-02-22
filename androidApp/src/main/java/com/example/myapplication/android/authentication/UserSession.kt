@@ -5,8 +5,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 class UserSession(var accessToken: String? = null) {
     val profile = MutableStateFlow<String>("")
 
-    // TODO: get user profile from server
     fun setAccessToken() {
+        // TODO: get user profile from server
         profile.value = accessToken ?: ""
     }
 }

@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,7 +21,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import net.openid.appauth.AuthorizationException
 import net.openid.appauth.AuthorizationResponse
-
 
 @Composable
 fun GreetingView(viewModel: GreetingViewModel) {
@@ -39,7 +37,6 @@ fun GreetingView(viewModel: GreetingViewModel) {
             val exception = AuthorizationException.fromIntent(authResult.data!!)
             // ... Token exchange logic here
             if (response != null) {
-
                 val authorizationCode = response.authorizationCode
                 val stateParameter = response.getState()
 
@@ -49,6 +46,7 @@ fun GreetingView(viewModel: GreetingViewModel) {
                 Log.e("GreetingView", "Authorization flow failed", exception)
             }
             Log.d("GreetingView", "hello from result OK")
+
         }
     }
     Scaffold(

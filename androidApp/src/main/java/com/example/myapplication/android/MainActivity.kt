@@ -37,8 +37,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-//                    GreetingView(greetingViewModel)
-                    AppNavHost()
+                    AppNavHost(homeViewModel, greetingViewModel)
                 }
             }
         }
@@ -64,17 +63,12 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun AppNavHost() {
+    private fun AppNavHost(
+        homeViewModel: HomeViewModel,
+        greetingViewModel: GreetingViewModel
+    ) {
         val navController = rememberNavController()
-        val uiHelper = UiHelper()
 
-        LaunchedEffect(uiHelper.routeName) {
-            snapshotFlow { uiHelper.routeName.value }
-                .collect {
-                    Log.d("AppNavHost", "uiHelper.routeName.value: ${uiHelper.routeName.value}")
-                    navController.navigate(it)
-                }
-        }
         NavHost(navController = navController, startDestination = "login") {
             composable("home") {
                 HomeView(homeViewModel)
