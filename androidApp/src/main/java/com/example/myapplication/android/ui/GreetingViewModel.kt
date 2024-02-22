@@ -5,14 +5,13 @@ import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import com.example.myapplication.android.authentication.UserSession
 import net.openid.appauth.AuthorizationRequest
-import net.openid.appauth.AuthorizationResponse
 import net.openid.appauth.AuthorizationService
 import net.openid.appauth.AuthorizationServiceConfiguration
 import net.openid.appauth.CodeVerifierUtil
 import net.openid.appauth.ResponseTypeValues
 import net.openid.appauth.TokenRequest
-import java.util.logging.LogRecord
 
 
 private const val baseUrl = "https://kyohoe-authorization-server-1a58960ea78f.herokuapp.com"
@@ -27,8 +26,25 @@ class GreetingViewModel : ViewModel() {
     private val scope = "public" // Adjust the scope according to your needs
 
     private var authService: AuthorizationService? = null
-    val codeVerifier = CodeVerifierUtil.generateRandomCodeVerifier()
+    private val codeVerifier: String? = CodeVerifierUtil.generateRandomCodeVerifier()
 //    val codeChallenge = CodeVerifierUtil.deriveCodeVerifierChallenge(codeVerifier)
+
+    /*
+
+    (possibly) old way:
+
+    val secureRandom = SecureRandom()
+    val bytes = ByteArray(64)
+    secureRandom.nextBytes(bytes)
+
+    val encoding = Base64.URL_SAFE or Base64.NO_PADDING or Base64.NO_WRAP
+    val codeVerifier = Base64.encodeToString(bytes, encoding)
+
+    val digest = MessageDigest.getInstance(Constants.MESSAGE_DIGEST_ALGORITHM)
+    val hash = digest.digest(codeVerifier.toByteArray())
+    val codeChallenge = Base64.encodeToString(hash, encoding)
+
+    */
 
     fun initAuthService(context: Context) {
         Log.d("ViewModel", "Initializing AuthService")
@@ -58,7 +74,7 @@ class GreetingViewModel : ViewModel() {
                 redirectUri
             )
             .setScope(scope)
-//            .setState("abc123")
+            .setState("abc123")
             .setCodeVerifier(codeVerifier)
             .build()
 
@@ -69,7 +85,11 @@ class GreetingViewModel : ViewModel() {
     fun getTokens(authorizationCode: String?, stateParameter: String?) {
 
         if (!authorizationCode.isNullOrEmpty() && !stateParameter.isNullOrEmpty()) {
-//            if (stateParameter != "abc123") ...
+            if (stateParameter != "abc123") {
+                // Handle the error appropriately
+                Log.e("ViewModel", "State parameter doesn't match")
+                return
+            }
 
             // Perform the token request
             val tokenExchangeRequest = TokenRequest.Builder(
@@ -88,13 +108,17 @@ class GreetingViewModel : ViewModel() {
                 // Handle token response or exception
                 if (response != null) {
                     // Token exchange succeeded
-                    val accessToken = response.accessToken
+                    // TODO: set profile data
+                    val userSession = UserSession(response.accessToken)
+                    userSession.setAccessToken()
                     // Use the access token (e.g., for API calls)
-                    Log.d("ViewModel", "Access Token: $accessToken")
+                    Log.d("ViewModel", "User userSession: $userSession")
+                    // TODO: go to home view
                 } else if (exception != null) {
                     // Token exchange failed
                     Log.e("ViewModel", "Token Request Error: ${exception.localizedMessage}")
                     // Handle the error appropriately
+                    // ...
                 }
             }
         }
