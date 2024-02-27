@@ -75,6 +75,7 @@ class GreetingViewModel : ViewModel() {
             )
             .setScope(scope)
             .setState("abc123")
+            .setPrompt("none")
             .setCodeVerifier(codeVerifier)
             .build()
 
